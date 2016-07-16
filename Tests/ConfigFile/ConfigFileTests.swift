@@ -3,7 +3,7 @@
 //
 // This source file is part of the SMUD open source project
 //
-// Copyright (c) 2016 Andrey Fidrya and SMUD project authors
+// Copyright (c) 2016 SMUD project authors
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See LICENSE.txt for license information
