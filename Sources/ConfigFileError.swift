@@ -1,0 +1,56 @@
+//
+// ConfigFileError.swift
+//
+// This source file is part of the SMUD open source project
+//
+// Copyright (c) 2016 SMUD project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See LICENSE.txt for license information
+// See CONTRIBUTORS.txt for the list of SMUD project authors
+//
+
+import Foundation
+
+struct ConfigFileError: ErrorProtocol, CustomStringConvertible {
+    enum ErrorKind: CustomStringConvertible {
+        case expectedSectionStart
+        case expectedSectionName
+        case expectedSectionEnd
+        case invalidSectionName
+        case expectedFieldName
+        case invalidFieldName
+        case emptyFieldName
+        case expectedNewlineInMultilineField
+        case invalidCharacterInMultilineField
+        case invalidEscapeSequenceInMultilineField
+        case unterminatedMultilineField
+        
+        var description: String {
+            switch self {
+            case .expectedSectionStart: return "expected '['"
+            case .expectedSectionName: return "expected section name terminated with ']'"
+            case .expectedSectionEnd: return "expected ']'"
+            case .invalidSectionName: return "invalid section name"
+            case .expectedFieldName: return "expected field name"
+            case .invalidFieldName: return "invalid field name"
+            case .emptyFieldName: return "empty field name"
+            case .expectedNewlineInMultilineField: return "expected newline after ':' in multiline field"
+            case .invalidCharacterInMultilineField: return "invalid character after ':' in multiline field"
+            case .invalidEscapeSequenceInMultilineField: return "invalid escape sequence in multiline block"
+            case .unterminatedMultilineField: return "unterminated multiline field"
+            }
+        }
+    }
+
+    let kind: ErrorKind
+    let line: Int?
+    let column: Int?
+    
+    var description: String {
+        guard let line = line, let column = column else {
+            return kind.description
+        }
+        return "[\(line):\(column)] \(kind.description)"
+    }
+}
