@@ -61,9 +61,9 @@ class ConfigFile {
                 var isHeredoc = false
                 
                 if !value.isEmpty {
-                    if let firstScalar = value.unicodeScalars.first where whitespacesAndNewlines.contains(firstScalar) {
+                    if let firstScalar = value.unicodeScalars.first, whitespacesAndNewlines.contains(firstScalar) {
                         isHeredoc = true
-                    } else if let lastScalar = value.unicodeScalars.last where whitespacesAndNewlines.contains(lastScalar) {
+                    } else if let lastScalar = value.unicodeScalars.last, whitespacesAndNewlines.contains(lastScalar) {
                         isHeredoc = true
                     } else if value.contains("\n") {
                         isHeredoc = true
