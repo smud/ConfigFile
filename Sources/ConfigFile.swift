@@ -23,8 +23,8 @@ class ConfigFile {
     private var scanner: Scanner?
     private var sections = Sections()
 
-    let whitespacesAndNewlines = NSCharacterSet.whitespacesAndNewlines()
-    let decimalDigits = NSCharacterSet.decimalDigits()
+    let whitespacesAndNewlines = CharacterSet.whitespacesAndNewlines
+    let decimalDigits = CharacterSet.decimalDigits
     
     func load(fromFile filename: String) throws {
         self.filename = filename
@@ -46,14 +46,14 @@ class ConfigFile {
         var out = ""
         
         let sortedSections = sections.sorted {
-            $0.0.compare($1.0, options: .numericSearch) == .orderedAscending
+            $0.0.compare($1.0, options: .numeric) == .orderedAscending
         }
         for section in sortedSections {
             out += "[\(section.key)]\n"
             let fields = section.value
         
             let sortedFields = fields.sorted {
-                $0.0.compare($1.0, options: .numericSearch) == .orderedAscending
+                $0.0.compare($1.0, options: .numeric) == .orderedAscending
             }
             for field in sortedFields {
                 let name = field.key

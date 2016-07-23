@@ -27,7 +27,7 @@ extension Scanner {
     
     var column: Int {
         let text = parsedText
-        if let range = text.range(of: "\n", options: .backwardsSearch) {
+        if let range = text.range(of: "\n", options: .backwards) {
             return text.distance(from: range.upperBound, to: text.endIndex) + 1
         }
         return parsedText.characters.count + 1
