@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import Utils
 
 class ConfigFile {
     // DEBUG
@@ -173,17 +174,16 @@ class ConfigFile {
     private func bitIndexes(section: String, field: String) -> [Int]? {
         guard let value = string(section: section, field: field) else { return nil }
         
-        var word: NSString?
         var result = [Int]()
         
         let scanner = Scanner(string: value)
-        guard scanner.scanString("(", into: nil) else { return nil }
-        while !scanner.scanString(")", into: nil) {
-            guard scanner.scanCharacters(from: decimalDigits, into: &word), let word = word else { return nil }
+        guard scanner.skipString("(") else { return nil }
+        while !scanner.skipString(")") {
+            guard let word = scanner.scanCharacters(from: decimalDigits) else { return nil }
             guard let bitIndex = Int(word as String) else { return nil }
             result.append(bitIndex)
 
-            scanner.scanString(",", into: nil)
+            scanner.skipString(",")
         }
         return result
     }
@@ -247,45 +247,35 @@ class ConfigFile {
     private func scanNextSection() throws {
         guard let scanner = scanner else { return }
         
-        guard scanner.scanString("[", into: nil) else {
+        guard scanner.skipString("[") else {
             try throwError(.expectedSectionStart)
         }
 
-        var sectionName: NSString?
-        guard scanner.scanUpTo("]", into: &sectionName) else {
+        guard let section = scanner.scanUpTo("]") else {
             try throwError(.expectedSectionName)
         }
 
-        guard scanner.scanString("]", into: nil) else {
+        guard scanner.skipString("]") else {
             try throwError(.expectedSectionEnd)
         }
         
         if ConfigFile.logFields {
-            print("[\(sectionName)]")
+            print("[\(section)]")
         }
 
         var fields = Fields()
-        
-        guard let section = sectionName as? String else {
-            try throwError(.invalidSectionName)
-        }
         
         while true {
             guard !scanner.isAtEnd else { break } // No more data
             
             let previousLocation = scanner.scanLocation
-            guard !scanner.scanString("[", into: nil) else {
+            guard !scanner.skipString("[") else {
                 scanner.scanLocation = previousLocation
                 break // Empty section (which is allowed)
             }
          
-            var fieldName: NSString?
-            guard scanner.scanUpToCharacters(from: scanner.charactersToBeSkipped ?? CharacterSet.whitespacesAndNewlines, into: &fieldName) else {
+            guard var field = scanner.scanUpToCharacters(from: scanner.charactersToBeSkipped ?? CharacterSet.whitespacesAndNewlines) else {
                 try throwError(.expectedFieldName)
-            }
-            
-            guard var field = fieldName as? String else {
-                try throwError(.invalidFieldName)
             }
             
             guard !field.isEmpty else {
@@ -323,18 +313,14 @@ class ConfigFile {
         defer { scanner.charactersToBeSkipped = previousCharactersToBeSkipped }
         
         // If at "\n" already, return empty string
-        guard !scanner.scanString("\n", into: nil) else {
+        guard !scanner.skipString("\n") else {
             return ""
         }
         
-        var nsline: NSString?
-        guard scanner.scanUpTo("\n", into: &nsline) else {
+        guard var line = scanner.scanUpTo("\n") else {
             return nil
         }
-        scanner.scanString("\n", into: nil)
-        guard var line = nsline as? String else {
-            return nil
-        }
+        scanner.skipString("\n")
         if line.hasSuffix("\r") {
             line = line.substring(to: line.index(before: line.endIndex))
         }

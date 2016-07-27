@@ -17,9 +17,7 @@ struct ConfigFileError: Error, CustomStringConvertible {
         case expectedSectionStart
         case expectedSectionName
         case expectedSectionEnd
-        case invalidSectionName
         case expectedFieldName
-        case invalidFieldName
         case emptyFieldName
         case expectedNewlineInMultilineField
         case invalidCharacterInMultilineField
@@ -31,9 +29,7 @@ struct ConfigFileError: Error, CustomStringConvertible {
             case .expectedSectionStart: return "expected '['"
             case .expectedSectionName: return "expected section name terminated with ']'"
             case .expectedSectionEnd: return "expected ']'"
-            case .invalidSectionName: return "invalid section name"
             case .expectedFieldName: return "expected field name"
-            case .invalidFieldName: return "invalid field name"
             case .emptyFieldName: return "empty field name"
             case .expectedNewlineInMultilineField: return "expected newline after ':' in multiline field"
             case .invalidCharacterInMultilineField: return "invalid character after ':' in multiline field"
