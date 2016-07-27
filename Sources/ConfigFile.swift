@@ -74,7 +74,7 @@ class ConfigFile {
                 switch isHeredoc {
                 case true:
                     out += "\(name):\n"
-                    value.enumerateLines { line, stop in
+                    value.forEachLine { line, stop in
                         if !line.isEmpty && line.hasPrefix("$") {
                             out += "$";
                         }
