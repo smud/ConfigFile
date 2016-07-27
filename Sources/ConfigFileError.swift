@@ -12,7 +12,7 @@
 
 import Foundation
 
-struct ConfigFileError: ErrorProtocol, CustomStringConvertible {
+struct ConfigFileError: Error, CustomStringConvertible {
     enum ErrorKind: CustomStringConvertible {
         case expectedSectionStart
         case expectedSectionName
