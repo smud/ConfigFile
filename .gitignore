@@ -4,6 +4,7 @@ ConfigFile.xcodeproj
 .idea/
 ConfigFileTestLoad.txt
 ConfigFileTestSave.txt
+ConfigFileTestNull.txt
 
 # Xcode
 #

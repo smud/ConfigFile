@@ -68,6 +68,26 @@ class ConfigFileTests: XCTestCase {
     let uint8Set: UInt8Set = [.first, .middle, /* hiddenValue, */ .last]
     let uint64Set: UInt64Set = [.first, .middle, /* hiddenValue, */ .last]
     
+    func testScannerNullCharacters() {
+        let scanner = Scanner(string: "a\0b\0")
+        let result = scanner.scanString("a\0")
+        //print("result: \(result.debugDescription), scanner.string: \(scanner.string.debugDescription)")
+        XCTAssertEqual(result, "a\0")
+        XCTAssertEqual(scanner.string, "a\0b\0")
+    }
+    
+    func testFileNullCharacters() {
+        let filename = "ConfigFileTestNull.txt"
+        let string = "a\0b"
+        do {
+            try string.write(toFile: filename, atomically: true, encoding: .utf8)
+            let result = try String(contentsOfFile: filename, encoding: .utf8)
+            XCTAssert(string == result)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+    
     func testSave() {
         let filename = "ConfigFileTestSave.txt"
         performSave(filename: filename)
@@ -158,6 +178,8 @@ class ConfigFileTests: XCTestCase {
 
     static var allTests : [(String, (ConfigFileTests) -> () throws -> Void)] {
         return [
+            ("testScannerNullCharacters", testScannerNullCharacters),
+            ("testFileNullCharacters", testFileNullCharacters),
             ("testSave", testSave),
             ("testLoad", testLoad),
             ("testParseErrors", testParseErrors),
