@@ -1,6 +1,9 @@
 tags
 Packages/
 ConfigFile.xcodeproj
+.idea/
+ConfigFileTestLoad.txt
+ConfigFileTestSave.txt
 
 # Xcode
 #
