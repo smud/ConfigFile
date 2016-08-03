@@ -80,9 +80,9 @@ class ConfigFile {
                         }
                         out += "\(line)\n"
                     }
-                    if value.hasSuffix("\n") {
-                        out += "\n"
-                    }
+                    //if value.hasSuffix("\n") {
+                    //    out += "\n"
+                    //}
                     out += "$\n"
                 case false:
                     out += "\(name) \(value)\n"
