@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 project(ConfigFile)
 
 if(UNIX AND NOT APPLE)
-    set(Swift "~/.swiftenv/shims/swift")
+    set(Swift "/home/user/.swiftenv/shims/swift")
 else()
     set(Swift "/Library/Developer/Toolchains/swift-latest.xctoolchain/usr/bin/swift")
 endif()
