@@ -188,7 +188,7 @@ class ConfigFile {
         return result
     }
     
-    func optionSet<T: OptionSet where T.RawValue: UnsignedInteger>(section: String, field: String) -> T? {
+    func optionSet<T: OptionSet>(section: String, field: String) -> T? where T.RawValue: UnsignedInteger {
         guard let indexes = bitIndexes(section: section, field: field) else { return nil }
         return T(bitIndexes: indexes)
     }
@@ -211,17 +211,17 @@ class ConfigFile {
         set(section: section, field: field, value: String(value))
     }
 
-    func set<T: FloatingPoint>(section: String, field: String, value: T) {
+    func set<T: FloatingPoint>(section: String, field: String, value: T) where T: LosslessStringConvertible {
         let value = String(value).replacingOccurrences(of: ",", with: ".")
         set(section: section, field: field, value: value)
     }
 
-    func set<T>(section: String, field: String, value: T) {
+    func set<T>(section: String, field: String, value: T) where T: LosslessStringConvertible {
         set(section: section, field: field, value: String(value))
     }
     
     // Maybe over complicated a bit: http://stackoverflow.com/questions/32102936/how-do-you-enumerate-optionsettype-in-swift-2
-    func set<T: OptionSet where T.RawValue: UnsignedInteger, T.Element == T>(section: String, field: String, value: T) {
+    func set<T: OptionSet>(section: String, field: String, value: T) where T.RawValue: UnsignedInteger, T.Element == T {
         var out = "("
         var first = true
         
