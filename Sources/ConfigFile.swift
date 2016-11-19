@@ -370,6 +370,6 @@ class ConfigFile {
 
     
     private func throwError(_ kind: ConfigFileError.ErrorKind) throws -> Never  {
-        throw ConfigFileError(kind: kind, line: scanner?.line, column: scanner?.column)
+        throw ConfigFileError(kind: kind, line: scanner?.line(), column: scanner?.column())
     }
 }
