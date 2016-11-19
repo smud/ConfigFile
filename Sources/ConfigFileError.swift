@@ -7,7 +7,7 @@
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of SMUD project authors
+// See AUTHORS.txt for the list of SMUD project authors
 //
 
 import Foundation

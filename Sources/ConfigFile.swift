@@ -7,11 +7,12 @@
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of SMUD project authors
+// See AUTHORS.txt for the list of SMUD project authors
 //
 
 import Foundation
-import Utils
+import StringUtils
+import ScannerUtils
 
 class ConfigFile {
     // DEBUG
@@ -370,6 +371,6 @@ class ConfigFile {
 
     
     private func throwError(_ kind: ConfigFileError.ErrorKind) throws -> Never  {
-        throw ConfigFileError(kind: kind, line: scanner?.line, column: scanner?.column)
+        throw ConfigFileError(kind: kind, line: scanner?.line(), column: scanner?.column())
     }
 }
