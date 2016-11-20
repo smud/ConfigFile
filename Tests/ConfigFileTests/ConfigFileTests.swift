@@ -98,7 +98,7 @@ class ConfigFileTests: XCTestCase {
         // Can't reuse testSave() because tests can be executed in parallel
         
         let filename = "ConfigFileTestLoad.txt"
-        performSave(filename: filename)
+        performSave(filename: filename, flags: .defaults)
         
         let configFile = ConfigFile()
         do {
@@ -121,10 +121,30 @@ class ConfigFileTests: XCTestCase {
         XCTAssertEqual(value12, configFile.string(section: "MAIN", field: "TEST12"))
         XCTAssertEqual(value13, configFile.string(section: "MAIN", field: "TEST13"))
         XCTAssertEqual(value14, configFile.string(section: "MAIN", field: "TEST14"))
+        
+        XCTAssertEqual(configFile.sectionNames, ["MAIN", "TYPES", "A", "C", "B", "D"])
+        XCTAssertEqual(configFile.fieldNames(forSection: "A"), ["a", "c", "b", "d"])
     }
     
-    func performSave(filename: String) {
+    func testLoadSorted() {
+        let filename = "ConfigFileTestLoadSorted.txt"
+        performSave(filename: filename, flags: [.sortSections, .sortFields])
+
         let configFile = ConfigFile()
+        do {
+            try configFile.load(fromFile: filename)
+        } catch {
+            XCTFail("Unable to load ConfigFile: \(error)")
+        }
+
+        
+        XCTAssertEqual(configFile.sectionNames, ["A", "B", "C", "D", "MAIN", "TYPES"])
+        XCTAssertEqual(configFile.fieldNames(forSection: "A"), ["a", "b", "c", "d"])
+    }
+    
+    func performSave(filename: String, flags: ConfigFileFlags = .defaults) {
+        let configFile = ConfigFile()
+        configFile.flags = flags
         configFile.set(section: "MAIN", field: "TEST1", value: value1)
         configFile.set(section: "MAIN", field: "TEST2", value: value2)
         configFile.set(section: "MAIN", field: "TEST3", value: value3)
@@ -157,6 +177,15 @@ class ConfigFileTests: XCTestCase {
         configFile.set(section: "TYPES", field: "character", value: characterValue)
         configFile.set(section: "TYPES", field: "uint8Set", value: uint8Set)
         configFile.set(section: "TYPES", field: "uint64Set", value: uint64Set)
+        
+        // Test order preservation
+        configFile.set(section: "A", field: "a", value: "A.a")
+        configFile.set(section: "A", field: "c", value: "A.c")
+        configFile.set(section: "A", field: "b", value: "A.b")
+        configFile.set(section: "A", field: "d", value: "A.d")
+        configFile.set(section: "C", field: "a", value: "C.a")
+        configFile.set(section: "B", field: "a", value: "B.a")
+        configFile.set(section: "D", field: "a", value: "D.a")
         
         do {
             try configFile.save(toFile: filename)

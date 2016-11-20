@@ -30,6 +30,9 @@ class ConfigFile {
     let whitespacesAndNewlines = CharacterSet.whitespacesAndNewlines
     let decimalDigits = CharacterSet.decimalDigits
     
+    var sectionNames: [String] { return sections.orderedKeys }
+    var isEmpty: Bool { return sections.isEmpty }
+
     init(flags: ConfigFileFlags = .defaults) {
         self.flags = flags
     }
@@ -44,6 +47,7 @@ class ConfigFile {
     func load(fromString string: String) throws {
         let scanner = Scanner(string: string)
         self.scanner = scanner
+        self.sections.removeAll(keepingCapacity: true)
         
         while !scanner.isAtEnd {
             try scanNextSection()
@@ -107,8 +111,10 @@ class ConfigFile {
         try out.write(toFile: filename, atomically: true, encoding: .utf8)
     }
     
-    var isEmpty: Bool { return sections.isEmpty }
-
+    func fieldNames(forSection section: String) -> [String] {
+        return sections[section]?.orderedKeys ?? []
+    }
+    
     func string(section: String, field: String) -> String? {
         return sections[section]?[field]
     }
@@ -230,8 +236,8 @@ class ConfigFile {
         set(section: section, field: field, value: value)
     }
 
-    func set<T>(section: String, field: String, value: T) where T: LosslessStringConvertible {
-        set(section: section, field: field, value: String(value))
+    func set<T>(section: String, field: String, value: T) where T: Integer {
+        set(section: section, field: field, value: String(describing: value))
     }
     
     // Maybe over complicated a bit: http://stackoverflow.com/questions/32102936/how-do-you-enumerate-optionsettype-in-swift-2
