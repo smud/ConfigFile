@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import CollectionUtils
 import StringUtils
 import ScannerUtils
 
@@ -18,9 +19,10 @@ class ConfigFile {
     // DEBUG
     private static let logFields = false
     
-    typealias Fields = [String: String]
-    typealias Sections = [String: Fields]
+    typealias Fields = OrderedDictionary<String, String>
+    typealias Sections = OrderedDictionary<String, Fields>
     
+    var flags: ConfigFileFlags
     var filename: String?
     private var scanner: Scanner?
     private var sections = Sections()
@@ -28,6 +30,10 @@ class ConfigFile {
     let whitespacesAndNewlines = CharacterSet.whitespacesAndNewlines
     let decimalDigits = CharacterSet.decimalDigits
     
+    init(flags: ConfigFileFlags = .defaults) {
+        self.flags = flags
+    }
+
     func load(fromFile filename: String) throws {
         self.filename = filename
 
@@ -47,19 +53,26 @@ class ConfigFile {
     func save(toFile filename: String) throws {
         var out = ""
         
-        let sortedSections = sections.sorted {
-            $0.0.compare($1.0, options: .numeric) == .orderedAscending
-        }
-        for section in sortedSections {
-            out += "[\(section.key)]\n"
-            let fields = section.value
-        
-            let sortedFields = fields.sorted {
-                $0.0.compare($1.0, options: .numeric) == .orderedAscending
+        var sectionKeys = sections.orderedKeys
+        if flags.contains(.sortSections) {
+            sectionKeys.sort {
+                $0.compare($1, options: .numeric) == .orderedAscending
             }
-            for field in sortedFields {
-                let name = field.key
-                let value = field.value
+        }
+        for sectionKey in sectionKeys {
+            out += "[\(sectionKey)]\n"
+            guard let fields = sections[sectionKey] else { continue }
+        
+            var fieldKeys = fields.orderedKeys
+            if flags.contains(.sortFields) {
+                fieldKeys.sort {
+                    $0.compare($1, options: .numeric) == .orderedAscending
+                }
+            }
+            
+            for fieldKey in fieldKeys {
+                guard let value = fields[fieldKey] else { continue }
+                let name = fieldKey
                 var isHeredoc = false
                 
                 if !value.isEmpty {
@@ -199,7 +212,7 @@ class ConfigFile {
     }
     
     func set(section: String, field: String, value: String) {
-        var fields = sections[section] ?? Fields()
+        let fields = sections[section] ?? Fields()
         fields[field] = value
         sections[section] = fields
     }
@@ -264,7 +277,7 @@ class ConfigFile {
             print("[\(section)]")
         }
 
-        var fields = Fields()
+        let fields = Fields()
         
         while true {
             guard !scanner.isAtEnd else { break } // No more data
