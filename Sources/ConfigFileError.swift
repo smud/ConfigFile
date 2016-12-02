@@ -23,6 +23,7 @@ struct ConfigFileError: Error, CustomStringConvertible {
         case invalidCharacterInMultilineField
         case invalidEscapeSequenceInMultilineField
         case unterminatedMultilineField
+        case sectionNameShouldntContainBrackets
         
         var description: String {
             switch self {
@@ -35,6 +36,7 @@ struct ConfigFileError: Error, CustomStringConvertible {
             case .invalidCharacterInMultilineField: return "invalid character after ':' in multiline field"
             case .invalidEscapeSequenceInMultilineField: return "invalid escape sequence in multiline block"
             case .unterminatedMultilineField: return "unterminated multiline field"
+            case .sectionNameShouldntContainBrackets: return "section name shouldn't contain brackets"
             }
         }
     }

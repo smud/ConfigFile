@@ -123,7 +123,7 @@ class ConfigFileTests: XCTestCase {
         XCTAssertEqual(value14, configFile.string(section: "MAIN", field: "TEST14"))
         
         XCTAssertEqual(configFile.sectionNames, ["MAIN", "TYPES", "A", "C", "B", "D"])
-        XCTAssertEqual(configFile.fieldNames(forSection: "A"), ["a", "c", "b", "d"])
+        XCTAssertEqual(configFile.fieldNames(section: "A"), ["a", "c", "b", "d"])
     }
     
     func testLoadSorted() {
@@ -139,7 +139,7 @@ class ConfigFileTests: XCTestCase {
 
         
         XCTAssertEqual(configFile.sectionNames, ["A", "B", "C", "D", "MAIN", "TYPES"])
-        XCTAssertEqual(configFile.fieldNames(forSection: "A"), ["a", "b", "c", "d"])
+        XCTAssertEqual(configFile.fieldNames(section: "A"), ["a", "b", "c", "d"])
     }
     
     func performSave(filename: String, flags: ConfigFileFlags = .defaults) {
@@ -204,6 +204,76 @@ class ConfigFileTests: XCTestCase {
             foundSyntaxError1 = true
         }
         XCTAssert(foundSyntaxError1)
+    }
+    
+    func testBinaryFile() {
+        let filename = "ConfigFileTestBinaryFile.txt"
+        let testString = getAllUnicodeScalarsAsString()
+        
+        do {
+            try testString.write(toFile: filename, atomically: true, encoding: .utf8)
+        } catch {
+            XCTFail("Unable to save binary file: \(error)")
+        }
+
+        do {
+            let inString = try String(contentsOfFile: filename, encoding: .utf8)
+            compareCharacterByCharacter(testString, inString)
+            XCTAssertTrue(inString == testString)
+        } catch {
+            XCTFail("Unable to read binary file: \(error)")
+        }
+    }
+    
+    func testUnicodeScalars() {
+        let testString = getAllUnicodeScalarsAsString()
+        
+        let configFile = ConfigFile()
+        configFile.set(section: "UnicodeScalars", field: "allScalars", value: testString)
+        
+        let filename = "ConfigFileTestUnicodeScalars.txt"
+        do {
+            try configFile.save(toFile: filename)
+        } catch {
+            XCTFail("Unable to save ConfigFile: \(error)")
+        }
+
+        let configFile2: ConfigFile
+        do {
+            try configFile2 = ConfigFile(fromFile: filename)
+            let inString = configFile2.string(section: "UnicodeScalars", field: "allScalars") ?? ""
+            compareCharacterByCharacter(testString, inString)
+            XCTAssertTrue(testString == inString)
+        } catch {
+            XCTFail("Unable to load ConfigFile: \(error)")
+        }
+    }
+    
+    func getAllUnicodeScalarsAsString() -> String {
+        var string = ""
+        var c = UnicodeScalar(0)!
+        while true {
+            string.append(String(c))
+            // Unicode scalars are [0 - D7FF] inclusive
+            guard c.value < 0xD7FF else { break }
+            c = UnicodeScalar(c.value + 1)!
+        }
+        return string
+    }
+    
+    func compareCharacterByCharacter(_ s1: String, _ s2: String) {
+        let s1Length = s1.characters.count
+        let s2Length = s2.characters.count
+        print("s1 length: \(s1Length), s2 length: \(s2Length)")
+        if s1 != s2 && s1Length == s2Length {
+            var index = 0
+            for (c1, c2) in zip(s1.characters, s2.characters) {
+                if c1 != c2 {
+                    print("Character mismatch at index \(index): '\(c1)' vs '\(c2)'; \(String(c1).unicodeScalars.first!.value), \(String(c2).unicodeScalars.first!.value)")
+                }
+                index += 1
+            }
+        }
     }
 
     static var allTests : [(String, (ConfigFileTests) -> () throws -> Void)] {

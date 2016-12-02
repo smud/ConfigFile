@@ -15,36 +15,46 @@ import CollectionUtils
 import StringUtils
 import ScannerUtils
 
-class ConfigFile {
+public class ConfigFile {
     // DEBUG
-    private static let logFields = false
+    static let logFields = false
     
     typealias Fields = OrderedDictionary<String, String>
     typealias Sections = OrderedDictionary<String, Fields>
     
     var flags: ConfigFileFlags
     var filename: String?
-    private var scanner: Scanner?
-    private var sections = Sections()
+    var scanner: Scanner?
+    var sections = Sections()
 
     let whitespacesAndNewlines = CharacterSet.whitespacesAndNewlines
     let decimalDigits = CharacterSet.decimalDigits
     
-    var sectionNames: [String] { return sections.orderedKeys }
-    var isEmpty: Bool { return sections.isEmpty }
+    public var sectionNames: [String] { return sections.orderedKeys }
+    public var isEmpty: Bool { return sections.isEmpty }
 
-    init(flags: ConfigFileFlags = .defaults) {
+    public init(flags: ConfigFileFlags = .defaults) {
         self.flags = flags
     }
+    
+    public convenience init(fromFile filename: String, flags: ConfigFileFlags = .defaults) throws {
+        self.init(flags: flags)
+        try load(fromFile: filename)
+    }
 
-    func load(fromFile filename: String) throws {
+    public convenience init(fromString string: String, flags: ConfigFileFlags = .defaults) throws {
+        self.init(flags: flags)
+        try load(fromString: string)
+    }
+
+    public func load(fromFile filename: String) throws {
         self.filename = filename
 
         let contents = try String(contentsOfFile: filename, encoding: .utf8)
         try load(fromString: contents)
     }
 
-    func load(fromString string: String) throws {
+    public func load(fromString string: String) throws {
         let scanner = Scanner(string: string)
         self.scanner = scanner
         self.sections.removeAll(keepingCapacity: true)
@@ -54,7 +64,7 @@ class ConfigFile {
         }
     }
     
-    func save(toFile filename: String) throws {
+    public func save(toFile filename: String, atomically: Bool = true) throws {
         var out = ""
         
         var sectionKeys = sections.orderedKeys
@@ -64,6 +74,12 @@ class ConfigFile {
             }
         }
         for sectionKey in sectionKeys {
+            guard !sectionKey.contains("]") else {
+                try throwError(.sectionNameShouldntContainBrackets)
+            }
+            if !out.isEmpty {
+                out += "\n"
+            }
             out += "[\(sectionKey)]\n"
             guard let fields = sections[sectionKey] else { continue }
         
@@ -108,90 +124,90 @@ class ConfigFile {
             }
         }
 
-        try out.write(toFile: filename, atomically: true, encoding: .utf8)
+        try out.write(toFile: filename, atomically: atomically, encoding: .utf8)
     }
     
-    func fieldNames(forSection section: String) -> [String] {
+    public func fieldNames(section: String) -> [String] {
         return sections[section]?.orderedKeys ?? []
     }
     
-    func string(section: String, field: String) -> String? {
+    public func string(section: String, field: String) -> String? {
         return sections[section]?[field]
     }
     
-    func int(section: String, field: String) -> Int? {
+    public func int(section: String, field: String) -> Int? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int(value)
     }
 
-    func int8(section: String, field: String) -> Int8? {
+    public func int8(section: String, field: String) -> Int8? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int8(value)
     }
 
-    func int16(section: String, field: String) -> Int16? {
+    public func int16(section: String, field: String) -> Int16? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int16(value)
     }
 
-    func int32(section: String, field: String) -> Int32? {
+    public func int32(section: String, field: String) -> Int32? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int32(value)
     }
 
-    func int64(section: String, field: String) -> Int64? {
+    public func int64(section: String, field: String) -> Int64? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int64(value)
     }
 
-    func uint(section: String, field: String) -> UInt? {
+    public func uint(section: String, field: String) -> UInt? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt(value)
     }
     
-    func uint8(section: String, field: String) -> UInt8? {
+    public func uint8(section: String, field: String) -> UInt8? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt8(value)
     }
 
-    func uint16(section: String, field: String) -> UInt16? {
+    public func uint16(section: String, field: String) -> UInt16? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt16(value)
     }
 
-    func uint32(section: String, field: String) -> UInt32? {
+    public func uint32(section: String, field: String) -> UInt32? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt32(value)
     }
 
-    func uint64(section: String, field: String) -> UInt64? {
+    public func uint64(section: String, field: String) -> UInt64? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt64(value)
     }
 
-    func bool(section: String, field: String) -> Bool? {
+    public func bool(section: String, field: String) -> Bool? {
         guard let value = int(section: section, field: field) else { return nil }
         return value != 0
     }
 
-    func double(section: String, field: String) -> Double? {
+    public func double(section: String, field: String) -> Double? {
         guard let value = string(section: section, field: field) else { return nil }
         // Replace all commas with dots in case they ended up in config file somehow
         return Double(value.replacingOccurrences(of: ",", with: "."))
     }
 
-    func float(section: String, field: String) -> Float? {
+    public func float(section: String, field: String) -> Float? {
         guard let value = string(section: section, field: field) else { return nil }
         // Replace all commas with dots in case they ended up in config file somehow
         return Float(value.replacingOccurrences(of: ",", with: "."))
     }
     
-    func character(section: String, field: String) -> Character? {
+    public func character(section: String, field: String) -> Character? {
         guard let value = string(section: section, field: field) else { return nil }
         return value.characters.first
     }
 
-    private func bitIndexes(section: String, field: String) -> [Int]? {
+    func bitIndexes(section: String, field: String) -> [Int]? {
         guard let value = string(section: section, field: field) else { return nil }
         
         var result = [Int]()
@@ -208,40 +224,40 @@ class ConfigFile {
         return result
     }
     
-    func optionSet<T: OptionSet>(section: String, field: String) -> T? where T.RawValue: UnsignedInteger {
+    public func optionSet<T: OptionSet>(section: String, field: String) -> T? where T.RawValue: UnsignedInteger {
         guard let indexes = bitIndexes(section: section, field: field) else { return nil }
         return T(bitIndexes: indexes)
     }
     
-    func delete(section: String) {
+    public func delete(section: String) {
         sections.removeValue(forKey: section)
     }
     
-    func set(section: String, field: String, value: String) {
+    public func set(section: String, field: String, value: String) {
         let fields = sections[section] ?? Fields()
         fields[field] = value
         sections[section] = fields
     }
 
-    func set(section: String, field: String, value: Bool) {
+    public func set(section: String, field: String, value: Bool) {
         set(section: section, field: field, value: value ? 1 : 0)
     }
 
-    func set(section: String, field: String, value: Character) {
+    public func set(section: String, field: String, value: Character) {
         set(section: section, field: field, value: String(value))
     }
 
-    func set<T: FloatingPoint>(section: String, field: String, value: T) where T: LosslessStringConvertible {
+    public func set<T: FloatingPoint>(section: String, field: String, value: T) where T: LosslessStringConvertible {
         let value = String(value).replacingOccurrences(of: ",", with: ".")
         set(section: section, field: field, value: value)
     }
 
-    func set<T>(section: String, field: String, value: T) where T: Integer {
+    public func set<T>(section: String, field: String, value: T) where T: Integer {
         set(section: section, field: field, value: String(describing: value))
     }
     
     // Maybe over complicated a bit: http://stackoverflow.com/questions/32102936/how-do-you-enumerate-optionsettype-in-swift-2
-    func set<T: OptionSet>(section: String, field: String, value: T) where T.RawValue: UnsignedInteger, T.Element == T {
+    public func set<T: OptionSet>(section: String, field: String, value: T) where T.RawValue: UnsignedInteger, T.Element == T {
         var out = "("
         var first = true
         
@@ -264,7 +280,7 @@ class ConfigFile {
         set(section: section, field: field, value: out)
     }
     
-    private func scanNextSection() throws {
+    func scanNextSection() throws {
         guard let scanner = scanner else { return }
         
         guard scanner.skipString("[") else {
@@ -325,7 +341,7 @@ class ConfigFile {
         sections[section] = fields
     }
     
-    private func scanLine() -> String? {
+    func scanLine() -> String? {
         guard let scanner = scanner else { return "" }
 
         let previousCharactersToBeSkipped = scanner.charactersToBeSkipped
@@ -347,7 +363,7 @@ class ConfigFile {
         return line
     }
     
-    private func scanMultilineField() throws -> String {
+    func scanMultilineField() throws -> String {
         // There should be nothing after ':'
         guard let line = scanLine() else {
             try throwError(.expectedNewlineInMultilineField)
@@ -388,8 +404,7 @@ class ConfigFile {
         return value
     }
 
-    
-    private func throwError(_ kind: ConfigFileError.ErrorKind) throws -> Never  {
+    func throwError(_ kind: ConfigFileError.ErrorKind) throws -> Never  {
         throw ConfigFileError(kind: kind, line: scanner?.line(), column: scanner?.column())
     }
 }
