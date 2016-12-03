@@ -226,7 +226,10 @@ class ConfigFileTests: XCTestCase {
     }
     
     func testUnicodeScalars() {
+        // Newlines are normalized on load, so exclude them from test
         let testString = getAllUnicodeScalarsAsString()
+            .replacingOccurrences(of: "\r\n", with: "")
+            .replacingOccurrences(of: "\r", with: "")
         
         let configFile = ConfigFile()
         configFile.set(section: "UnicodeScalars", field: "allScalars", value: testString)

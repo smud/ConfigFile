@@ -55,7 +55,9 @@ public class ConfigFile {
     }
 
     public func load(fromString string: String) throws {
-        let scanner = Scanner(string: string)
+        let scanner = Scanner(string: string
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n"))
         self.scanner = scanner
         self.sections.removeAll(keepingCapacity: true)
         
@@ -353,13 +355,10 @@ public class ConfigFile {
             return ""
         }
         
-        guard var line = scanner.scanUpTo("\n") else {
+        guard let line = scanner.scanUpTo("\n") else {
             return nil
         }
         scanner.skipString("\n")
-        if line.hasSuffix("\r") {
-            line = line.substring(to: line.index(before: line.endIndex))
-        }
         return line
     }
     
