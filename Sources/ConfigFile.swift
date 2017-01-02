@@ -129,87 +129,89 @@ public class ConfigFile {
         try out.write(toFile: filename, atomically: atomically, encoding: .utf8)
     }
     
-    public func fieldNames(section: String) -> [String] {
+    public func fieldNames(section: String = "") -> [String] {
         return sections[section]?.orderedKeys ?? []
     }
     
-    public func string(section: String, field: String) -> String? {
+    public func string(section: String = "", field: String) -> String? {
         return sections[section]?[field]
     }
     
-    public func int(section: String, field: String) -> Int? {
+    public func int(section: String = "", field: String) -> Int? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int(value)
     }
 
-    public func int8(section: String, field: String) -> Int8? {
+    public func int8(section: String = "", field: String) -> Int8? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int8(value)
     }
 
-    public func int16(section: String, field: String) -> Int16? {
+    public func int16(section: String = "", field: String) -> Int16? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int16(value)
     }
 
-    public func int32(section: String, field: String) -> Int32? {
+    public func int32(section: String = "", field: String) -> Int32? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int32(value)
     }
 
-    public func int64(section: String, field: String) -> Int64? {
+    public func int64(section: String = "", field: String) -> Int64? {
         guard let value = string(section: section, field: field) else { return nil }
         return Int64(value)
     }
 
-    public func uint(section: String, field: String) -> UInt? {
+    public func uint(section: String = "", field: String) -> UInt? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt(value)
     }
     
-    public func uint8(section: String, field: String) -> UInt8? {
+    public func uint8(section: String = "", field: String) -> UInt8? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt8(value)
     }
 
-    public func uint16(section: String, field: String) -> UInt16? {
+    public func uint16(section: String = "", field: String) -> UInt16? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt16(value)
     }
 
-    public func uint32(section: String, field: String) -> UInt32? {
+    public func uint32(section: String = "", field: String) -> UInt32? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt32(value)
     }
 
-    public func uint64(section: String, field: String) -> UInt64? {
+    public func uint64(section: String = "", field: String) -> UInt64? {
         guard let value = string(section: section, field: field) else { return nil }
         return UInt64(value)
     }
 
-    public func bool(section: String, field: String) -> Bool? {
-        guard let value = int(section: section, field: field) else { return nil }
-        return value != 0
+    public func bool(section: String = "", field: String) -> Bool? {
+        guard let value = string(section: section, field: field) else { return nil }
+        if value.lowercased() == "true" { return true }
+        guard let number = Int(value) else { return false }
+        return number != 0
     }
 
-    public func double(section: String, field: String) -> Double? {
+    public func double(section: String = "", field: String) -> Double? {
         guard let value = string(section: section, field: field) else { return nil }
         // Replace all commas with dots in case they ended up in config file somehow
         return Double(value.replacingOccurrences(of: ",", with: "."))
     }
 
-    public func float(section: String, field: String) -> Float? {
+    public func float(section: String = "", field: String) -> Float? {
         guard let value = string(section: section, field: field) else { return nil }
         // Replace all commas with dots in case they ended up in config file somehow
         return Float(value.replacingOccurrences(of: ",", with: "."))
     }
     
-    public func character(section: String, field: String) -> Character? {
+    public func character(section: String = "", field: String) -> Character? {
         guard let value = string(section: section, field: field) else { return nil }
         return value.characters.first
     }
 
-    func bitIndexes(section: String, field: String) -> [Int]? {
+    private func bitIndexes(section: String = "", field: String) -> [Int]? {
         guard let value = string(section: section, field: field) else { return nil }
         
         var result = [Int]()
@@ -226,7 +228,7 @@ public class ConfigFile {
         return result
     }
     
-    public func optionSet<T: OptionSet>(section: String, field: String) -> T? where T.RawValue: UnsignedInteger {
+    public func optionSet<T: OptionSet>(section: String = "", field: String) -> T? where T.RawValue: UnsignedInteger {
         guard let indexes = bitIndexes(section: section, field: field) else { return nil }
         return T(bitIndexes: indexes)
     }
@@ -235,51 +237,84 @@ public class ConfigFile {
         sections.removeValue(forKey: section)
     }
     
-    public func set(section: String, field: String, value: String) {
-        let fields = sections[section] ?? Fields()
-        fields[field] = value
-        sections[section] = fields
+    public func set(section: String = "", field: String, value: String?) {
+        if let value = value {
+            let fields = sections[section] ?? Fields()
+            fields[field] = value
+            sections[section] = fields
+        } else {
+            reset(section: section, field: field)
+        }
     }
 
-    public func set(section: String, field: String, value: Bool) {
-        set(section: section, field: field, value: value ? 1 : 0)
+    public func set(section: String = "", field: String, value: Bool?) {
+        if let value = value {
+            set(section: section, field: field, value: value ? "true" : "false")
+        } else {
+            reset(section: section, field: field)
+        }
     }
 
-    public func set(section: String, field: String, value: Character) {
-        set(section: section, field: field, value: String(value))
+    public func set(section: String = "", field: String, value: Character?) {
+        if let value = value {
+            set(section: section, field: field, value: String(value))
+        } else {
+            reset(section: section, field: field)
+        }
     }
 
-    public func set<T: FloatingPoint>(section: String, field: String, value: T) where T: LosslessStringConvertible {
-        let value = String(value).replacingOccurrences(of: ",", with: ".")
-        set(section: section, field: field, value: value)
+    public func set<T: FloatingPoint>(section: String = "", field: String, value: T?) where T: LosslessStringConvertible {
+        if let value = value {
+            let value = String(value).replacingOccurrences(of: ",", with: ".")
+            set(section: section, field: field, value: value)
+        } else {
+            reset(section: section, field: field)
+        }
     }
 
-    public func set<T>(section: String, field: String, value: T) where T: Integer {
-        set(section: section, field: field, value: String(describing: value))
+    public func set<T>(section: String = "", field: String, value: T?) where T: Integer {
+        if let value = value {
+            set(section: section, field: field, value: String(describing: value))
+        } else {
+            reset(section: section, field: field)
+        }
     }
     
     // Maybe over complicated a bit: http://stackoverflow.com/questions/32102936/how-do-you-enumerate-optionsettype-in-swift-2
-    public func set<T: OptionSet>(section: String, field: String, value: T) where T.RawValue: UnsignedInteger, T.Element == T {
-        var out = "("
-        var first = true
-        
-        var rawValue = T.RawValue(1)
-        var index = 0
-        while rawValue != 0 {
-            let candidate = T(rawValue: rawValue)
-            if value.contains(candidate) {
-                switch first {
-                case true: first = false
-                case false: out += ", "
+    public func set<T: OptionSet>(section: String = "", field: String, value: T?) where T.RawValue: UnsignedInteger, T.Element == T {
+        if let value = value {
+            var out = "("
+            var first = true
+            
+            var rawValue = T.RawValue(1)
+            var index = 0
+            while rawValue != 0 {
+                let candidate = T(rawValue: rawValue)
+                if value.contains(candidate) {
+                    switch first {
+                    case true: first = false
+                    case false: out += ", "
+                    }
+                    out += String(index)
                 }
-                out += String(index)
+                rawValue = rawValue &* 2
+                index += 1
             }
-            rawValue = rawValue &* 2
-            index += 1
-        }
-        out += ")"
+            out += ")"
 
-        set(section: section, field: field, value: out)
+            set(section: section, field: field, value: out)
+        } else {
+            reset(section: section, field: field)
+        }
+    }
+    
+    public func reset(section: String, field: String) {
+        guard let fields = sections[section] else {
+            return
+        }
+        if nil != fields.removeValue(forKey: field) {
+            sections[section] = fields
+        }
     }
     
     func scanNextSection() throws {
@@ -289,12 +324,18 @@ public class ConfigFile {
             try throwError(.expectedSectionStart)
         }
 
-        guard let section = scanner.scanUpTo("]") else {
-            try throwError(.expectedSectionName)
-        }
-
-        guard scanner.skipString("]") else {
-            try throwError(.expectedSectionEnd)
+        let section: String
+        if scanner.skipString("]") {
+            section = ""
+        } else {
+            guard let value = scanner.scanUpTo("]") else {
+                try throwError(.expectedSectionName)
+            }
+            section = value
+            
+            guard scanner.skipString("]") else {
+                try throwError(.expectedSectionEnd)
+            }
         }
         
         if ConfigFile.logFields {
