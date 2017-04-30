@@ -133,86 +133,86 @@ public class ConfigFile {
         return sections[section]?.orderedKeys ?? []
     }
     
-    public func string(section: String = "", field: String) -> String? {
+    public func get(section: String = "", field: String) -> String? {
         return sections[section]?[field]
     }
     
     public func get(section: String = "", field: String) -> Int? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return Int(value)
     }
 
     public func get(section: String = "", field: String) -> Int8? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return Int8(value)
     }
 
     public func get(section: String = "", field: String) -> Int16? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return Int16(value)
     }
 
     public func get(section: String = "", field: String) -> Int32? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return Int32(value)
     }
 
     public func get(section: String = "", field: String) -> Int64? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return Int64(value)
     }
 
     public func get(section: String = "", field: String) -> UInt? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return UInt(value)
     }
     
     public func get(section: String = "", field: String) -> UInt8? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return UInt8(value)
     }
 
     public func get(section: String = "", field: String) -> UInt16? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return UInt16(value)
     }
 
     public func get(section: String = "", field: String) -> UInt32? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return UInt32(value)
     }
 
     public func get(section: String = "", field: String) -> UInt64? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return UInt64(value)
     }
 
     public func get(section: String = "", field: String) -> Bool? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         if value.lowercased() == "true" { return true }
         guard let number = Int(value) else { return false }
         return number != 0
     }
 
     public func get(section: String = "", field: String) -> Double? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         // Replace all commas with dots in case they ended up in config file somehow
         return Double(value.replacingOccurrences(of: ",", with: "."))
     }
 
     public func get(section: String = "", field: String) -> Float? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         // Replace all commas with dots in case they ended up in config file somehow
         return Float(value.replacingOccurrences(of: ",", with: "."))
     }
     
     public func get(section: String = "", field: String) -> Character? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         return value.characters.first
     }
 
     private func bitIndexes(section: String = "", field: String) -> [Int]? {
-        guard let value = string(section: section, field: field) else { return nil }
+        guard let value: String = get(section: section, field: field) else { return nil }
         
         var result = [Int]()
         

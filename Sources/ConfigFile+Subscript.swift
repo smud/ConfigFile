@@ -15,7 +15,7 @@ import Foundation
 
 public extension ConfigFile {
     subscript (section: String, field: String) -> String? {
-        get { return string(section: section, field: field) }
+        get { return get(section: section, field: field) }
         set { set(section: section, field: field, value: newValue) }
     }
     
