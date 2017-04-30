@@ -14,78 +14,78 @@
 import Foundation
 
 public extension ConfigFile {
-    subscript (section: String, field: String) -> String? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> String? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> Int? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Int? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> Int8? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Int8? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> Int16? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Int16? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> Int32? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Int32? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> Int64? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Int64? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> UInt? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> UInt? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> UInt8? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> UInt8? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> UInt16? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> UInt16? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> UInt32? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> UInt32? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> UInt64? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> UInt64? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
     
-    subscript (section: String, field: String) -> Bool? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Bool? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> Double? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Double? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> Float? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Float? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 
-    subscript (section: String, field: String) -> Character? {
-        get { return get(section: section, field: field) }
-        set { set(section: section, field: field, value: newValue) }
+    subscript (_ name: String) -> Character? {
+        get { return get(name) }
+        set { set(name, newValue) }
     }
 }
