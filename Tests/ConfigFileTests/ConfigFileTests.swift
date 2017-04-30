@@ -107,6 +107,10 @@ class ConfigFileTests: XCTestCase {
             XCTFail("Unable to load ConfigFile: \(error)")
         }
         
+        XCTAssertEqual(intValue, configFile.get(".fieldWithoutSection1"))
+        XCTAssertEqual(intValue, configFile.get("fieldWithoutSection2"))
+        XCTAssertEqual(intValue, configFile.get(".fieldName.withDot"))
+        
         XCTAssertEqual(value1, configFile.get("MAIN.TEST1"))
         XCTAssertEqual(value2, configFile.get("MAIN.TEST2"))
         XCTAssertEqual(value3, configFile.get("MAIN.TEST3"))
@@ -140,7 +144,7 @@ class ConfigFileTests: XCTestCase {
         XCTAssertTrue(uint8Set == configFile.get("TYPES.uint8Set"))
         XCTAssertTrue(uint64Set == configFile.get("TYPES.uint64Set"))
         
-        XCTAssertEqual(configFile.sectionNames, ["MAIN", "TYPES", "A", "C", "B", "D"])
+        XCTAssertEqual(configFile.sectionNames, ["", "MAIN", "TYPES", "A", "C", "B", "D"])
         XCTAssertEqual(configFile.fieldNames(section: "A"), ["a", "c", "b", "d"])
     }
     
@@ -156,13 +160,18 @@ class ConfigFileTests: XCTestCase {
         }
 
         
-        XCTAssertEqual(configFile.sectionNames, ["A", "B", "C", "D", "MAIN", "TYPES"])
+        XCTAssertEqual(configFile.sectionNames, ["", "A", "B", "C", "D", "MAIN", "TYPES"])
         XCTAssertEqual(configFile.fieldNames(section: "A"), ["a", "b", "c", "d"])
     }
     
     func performSave(filename: String, flags: ConfigFileFlags = .defaults) {
         let configFile = ConfigFile()
         configFile.flags = flags
+        
+        configFile.set(".fieldWithoutSection1", intValue)
+        configFile.set("fieldWithoutSection2", intValue)
+        configFile.set(".fieldName.withDot", intValue)
+        
         configFile.set("MAIN.TEST1", value1)
         configFile.set("MAIN.TEST2", value2)
         configFile.set("MAIN.TEST3", value3)
