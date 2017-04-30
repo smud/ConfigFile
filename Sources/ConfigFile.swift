@@ -82,7 +82,11 @@ public class ConfigFile {
             if !out.isEmpty {
                 out += "\n"
             }
-            out += "[\(sectionKey)]\n"
+            if sectionKey.isEmpty && sectionKey == sectionKeys.first {
+                // Don't start config file with "[]"
+            } else {
+                out += "[\(sectionKey)]\n"
+            }
             guard let fields = sections[sectionKey] else { continue }
         
             var fieldKeys = fields.orderedKeys
@@ -332,22 +336,22 @@ public class ConfigFile {
     func scanNextSection() throws {
         guard let scanner = scanner else { return }
         
-        guard scanner.skipString("[") else {
-            try throwError(.expectedSectionStart)
-        }
-
         let section: String
-        if scanner.skipString("]") {
-            section = ""
+        if scanner.skipString("[") {
+            if scanner.skipString("]") {
+                section = ""
+            } else {
+                guard let value = scanner.scanUpTo("]") else {
+                    try throwError(.expectedSectionName)
+                }
+                section = value
+                
+                guard scanner.skipString("]") else {
+                    try throwError(.expectedSectionEnd)
+                }
+            }
         } else {
-            guard let value = scanner.scanUpTo("]") else {
-                try throwError(.expectedSectionName)
-            }
-            section = value
-            
-            guard scanner.skipString("]") else {
-                try throwError(.expectedSectionEnd)
-            }
+            section = ""
         }
         
         if ConfigFile.logFields {

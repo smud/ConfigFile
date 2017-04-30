@@ -14,7 +14,7 @@ import Foundation
 
 struct ConfigFileError: Error, CustomStringConvertible {
     enum ErrorKind: CustomStringConvertible {
-        case expectedSectionStart
+        //case expectedSectionStart
         case expectedSectionName
         case expectedSectionEnd
         case expectedFieldName
@@ -27,7 +27,7 @@ struct ConfigFileError: Error, CustomStringConvertible {
         
         var description: String {
             switch self {
-            case .expectedSectionStart: return "expected '['"
+            //case .expectedSectionStart: return "expected '['"
             case .expectedSectionName: return "expected section name terminated with ']'"
             case .expectedSectionEnd: return "expected ']'"
             case .expectedFieldName: return "expected field name"
